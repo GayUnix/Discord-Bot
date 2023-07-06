@@ -7,7 +7,6 @@ import random
 import pyjokes;
 import requests;
 import datetime;
-from discord.ext.games import TicTacToe;
 import asyncio;
 
 prefix: str                             =       "$GAY "
