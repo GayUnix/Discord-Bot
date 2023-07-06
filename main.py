@@ -119,7 +119,7 @@ async def tictactoe(ctx, plyr):
             await ctx.send("> exiting...")
             break
         except asyncio.TimeoutError:
-            await ctx.send("Game timed out. Exiting.")
+            await ctx.send("> Game timed out. Exiting.")
             break
 
 @client.command(name="urban", description="To get a definition from the urban dictionnary")
