@@ -47,7 +47,8 @@ youtube: list                           =       lambda keyword: youtubesearchpyt
 
 spotify_search: list                    =       lambda link: [i for i in ep.get(link) if "/track/" in i]
 
-name: str                               =       lambda link: bs4.BeautifulSoup(requests.get(link.split('?')[0]).text, 'html.parser').title.string.split(" | ")[0]
+def name(link: str) -> str:
+    return bs4.BeautifulSoup(requests.get(link.split('?')[0]).text, 'html.parser').title.string.split(" | ")[0]
 
 def yt_search(keyword: str) -> tuple:
     idk, YDL_OPTIONS = youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result'][0], {'format': 'bestaudio/best', 'noplaylist':'True'}
@@ -185,7 +186,7 @@ async def test(interaction):
 @client.slash_command(name="clear", description="To clear messages")
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
 async def clear(interaction, number: int):
-    return await interaction.channel.purge(limit=int(number) + 1)
+    return await interaction.channel.purge(limit=int(number))
 
 @client.slash_command(name="run", description = "execute a python code")
 @commands.check_any(commands.is_owner(), commands.has_permissions(administrator=True))
