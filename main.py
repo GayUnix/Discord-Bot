@@ -113,7 +113,7 @@ async def guess(ctx, max: int = 100):
         return msg.channel == ctx.channel and msg.content.isnumeric()
 
     n = random.randint(0, max)
-    ctx.send(f"## starting the guessing (min: 0, max: {max})")
+    await ctx.send(f"## starting the guessing (min: 0, max: {max})")
     while True:
         e = await client.wait_for("message", check=check, timeout=60)
         if int(e.content) == n:
