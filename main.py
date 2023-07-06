@@ -381,7 +381,7 @@ async def join(interaction):
 @client.slash_command(name="leave", description="leave a vocale channel")
 async def leave(interaction):
     if interaction.author.voice and interaction.guild.voice_client.is_connected():
-        await interaction.author.voice.channel.disconnect()
+        await interaction.guild.voice_client.disconnect()
         return await interaction.send("> left", ephemeral=True)
     else: 
         return await interaction.send("> join a voc before executing this", ephemeral=True)
