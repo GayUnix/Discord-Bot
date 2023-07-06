@@ -407,7 +407,7 @@ async def spotify(interaction, playlist: str, shuffle: bool = False):
         for _ in songs:
             await event.wait()
             event.clear()
-            url, name, music, pic, duration, vview, description = yt_search(_)
+            url, name, music, pic, duration, vview, description = yt_search(name(_))
             resume, pause, skip, urlb = Button(label="resume", style=disnake.ButtonStyle.green), Button(label="pause", style=disnake.ButtonStyle.danger), Button(label="skip", style=disnake.ButtonStyle.primary), Button(label=name, url=url)
             async def resumef(interaction): 
                 if interaction.author.voice and interaction.guild.voice_client.is_connected():
