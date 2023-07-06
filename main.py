@@ -3,9 +3,11 @@ import disnake;
 from disnake.ui import Button, View;
 import youtubesearchpython;
 import yt_dlp;
+import random
 import pyjokes;
 import requests;
 import datetime;
+from discord.ext.games import TicTacToe;
 import asyncio;
 
 prefix: str                             =       "$GAY "
@@ -31,6 +33,29 @@ def yt_search(keyword: str) -> tuple:
     with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl: meta:dict = ydl.extract_info(idk["link"], download=False)
     return idk["link"], idk["title"][0:80], meta['url'], idk['thumbnails'][0]['url'].split('?')[0], idk['duration'], idk['viewCount']['short'], idk['descriptionSnippet'][0]['text'][0:2048]
 
+def print_board(board):
+    formatted_board = ""
+    for row in board:
+        formatted_board += "-" * 9 + "\n"
+        formatted_board += "|".join(row) + "\n"
+    return formatted_board
+
+def check_winner(board):
+    for row in board:
+        if row[0] == row[1] == row[2] != " ":
+            return row[0]
+
+    for col in range(3):
+        if board[0][col] == board[1][col] == board[2][col] != " ":
+            return board[0][col]
+
+    if board[0][0] == board[1][1] == board[2][2] != " ":
+        return board[0][0]
+    if board[0][2] == board[1][1] == board[2][0] != " ":
+        return board[0][2]
+
+    return None
+
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user}!")
@@ -49,8 +74,57 @@ async def test(ctx):
 async def clear(ctx, number: int):
     return await ctx.channel.purge(limit=int(number) + 1)
 
+@client.command(name="tictactoe", description="just to have fun playing tictactoe with friends :)")
+async def tictactoe(ctx, plyr):
+    board = [[" ", " ", " "] for _ in range(3)]
+    e = ["X", "O"]
+    random.shuffle(e)
+    players = {e[0]: ctx.author, e[1]: plyr}
+    current_player = e[0]
+
+    message = await ctx.send(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
+
+    def check(msg):
+        return msg.author == players[current_player] and msg.channel == ctx.channel
+
+    while True:
+        try:
+            e = await client.wait_for("message", check=check, timeout=60)
+            if any([u in e.content for u in ["end", "finish", "leave", "quit"]]):
+                print([0][10])
+            row, col = [int(i) - 1 for i in e.content.split()[-1].split(".")]
+
+            if 0 <= row <= 2 and 0 <= col <= 2:
+                if board[row][col] == " ":
+                    board[row][col] = current_player
+
+                    winner = check_winner(board)
+                    if winner:
+                        await message.edit(content=f"```\n{print_board(board)}\n```\n# Player {players[winner]} wins!")
+                        break
+
+                    if current_player == "X":
+                        current_player = "O"
+                    else:
+                        current_player = "X"
+                else:
+                    await ctx.send("Invalid move. Try again.")
+            else:
+                await ctx.send("Invalid input. Row and column should be in the range 1..3.")
+
+            await message.edit(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
+
+        except ValueError:
+            await ctx.send("Invalid input. Please enter a valid row and column.")
+        except IndexError:
+            await ctx.send("> exiting...")
+            break
+        except asyncio.TimeoutError:
+            await ctx.send("Game timed out. Exiting.")
+            break
+
 @client.command(name="urban", description="To get a definition from the urban dictionnary")
-async def uurban(ctx, times: int, *word):
+async def urban(ctx, times: int, *word):
     for index, definition in enumerate(requests.get(f"https://api.urbandictionary.com/v0/define?term={word}").json()["list"][0:times]):
         try:
             ctx.send(f"- {index}) {definition['definition']}")
@@ -130,105 +204,105 @@ async def avatar(interaction, user: disnake.Member = None):
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="cuddle")
-async def cuddle(interaction, user: disnake.User = ""):
+async def cuddle(interaction, user: disnake.Member = ""):
     action, link = waifu.get("cuddle")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="cry")
-async def cry(interaction, user: disnake.User = ""):
+async def cry(interaction, user: disnake.Member = ""):
     action, link = waifu.get("cry")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="hug")
-async def hug(interaction, user: disnake.User = ""):
+async def hug(interaction, user: disnake.Member = ""):
     action, link = waifu.get("hug")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="pat")
-async def pat(interaction, user: disnake.User = ""):
+async def pat(interaction, user: disnake.Member = ""):
     action, link = waifu.get("pat")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="blush")
-async def blush(interaction, user: disnake.User = ""):
+async def blush(interaction, user: disnake.Member = ""):
     action, link = waifu.get("blush")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="smile")
-async def smile(interaction, user: disnake.User = ""):
+async def smile(interaction, user: disnake.Member = ""):
     action, link = waifu.get("smile")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="wave")
-async def wave(interaction, user: disnake.User = ""):
+async def wave(interaction, user: disnake.Member = ""):
     action, link = waifu.get("wave")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="bite")
-async def bite(interaction, user: disnake.User = ""):
+async def bite(interaction, user: disnake.Member = ""):
     action, link = waifu.get("bite")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="slap")
-async def slap(interaction, user: disnake.User = ""):
+async def slap(interaction, user: disnake.Member = ""):
     action, link = waifu.get("slap")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="kill")
-async def kill(interaction, user: disnake.User = ""):
+async def kill(interaction, user: disnake.Member = ""):
     action, link = waifu.get("kill")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="kick")
-async def kick(interaction, user: disnake.User = ""):
+async def kick(interaction, user: disnake.Member = ""):
     action, link = waifu.get("kick")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="happy")
-async def happy(interaction, user: disnake.User = ""):
+async def happy(interaction, user: disnake.Member = ""):
     action, link = waifu.get("happy")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="wink")
-async def wink(interaction, user: disnake.User = ""):
+async def wink(interaction, user: disnake.Member = ""):
     action, link = waifu.get("wink")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="dance")
-async def dance(interaction, user: disnake.User = ""):
+async def dance(interaction, user: disnake.Member = ""):
     action, link = waifu.get("dance")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
     return await interaction.send(embed=embed)
 
 @client.slash_command(name="cringe")
-async def cringe(interaction, user: disnake.User = ""):
+async def cringe(interaction, user: disnake.Member = ""):
     action, link = waifu.get("cringe")
     embed = disnake.Embed(title=f"{interaction.author} {action} {user}", color=disnake.Color.purple())
     embed.set_image(url=link)
