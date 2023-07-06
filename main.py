@@ -144,11 +144,15 @@ async def guess(ctx, max: int = 100):
     n = random.randint(0, max)
     await ctx.send(f"## starting the guessing (min: 0, max: {max})")
     while True:
-        e = await client.wait_for("message", check=check, timeout=60)
-        if int(e.content) == n:
-            return await e.reply(f"# {e.author} wins!!")
+        try:
+            e = await client.wait_for("message", check=check, timeout=60)
+            if int(e.content) == n:
+                return await e.reply(f"# {e.author} wins!!")
 
-        await ctx.send(("- more" if int(e.content) < n else "- less") + " than " + e.content)
+            await ctx.send(("- more" if int(e.content) < n else "- less") + " than " + e.content)
+        except asyncio.TimeoutError:
+            await ctx.send("> Game timed out. Exiting.")
+            break
 
 @client.command(name="tictactoe", description="just to have fun playing tictactoe with friends :)")
 async def tictactoe(ctx, plyr: disnake.Member):
