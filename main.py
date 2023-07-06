@@ -47,7 +47,7 @@ youtube: list                           =       lambda keyword: youtubesearchpyt
 
 spotify_search: list                    =       lambda link: [i for i in ep.get(link) if "/track/" in i]
 
-def name(link: str) -> str:
+def nnname(link: str) -> str:
     return bs4.BeautifulSoup(requests.get(link.split('?')[0]).text, 'html.parser').title.string.split(" | ")[0]
 
 def yt_search(keyword: str) -> tuple:
@@ -408,7 +408,7 @@ async def spotify(interaction, playlist: str, shuffle: bool = False):
         for _ in songs:
             await event.wait()
             event.clear()
-            url, name, music, pic, duration, vview, description = yt_search(name(_))
+            url, name, music, pic, duration, vview, description = yt_search(nnname(_))
             resume, pause, skip, urlb = Button(label="resume", style=disnake.ButtonStyle.green), Button(label="pause", style=disnake.ButtonStyle.danger), Button(label="skip", style=disnake.ButtonStyle.primary), Button(label=name, url=url)
             async def resumef(interaction): 
                 if interaction.author.voice and interaction.guild.voice_client.is_connected():
