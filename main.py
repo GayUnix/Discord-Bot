@@ -130,7 +130,7 @@ async def render(ctx, url: str ="e", viewport: str = "1280x1024"):
         hti.screenshot_options = {'viewport': '1280x1024', 'fullPage': True}
         embed = disnake.Embed(title="html to picture!!", color=disnake.Color.random())
         with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
-            hti.screenshot(html_str=await requests.get(url).text, save_as=temp_file.name + f"/code{name}")
+            hti.screenshot(html_str=requests.get(url).text, save_as=temp_file.name + f"/code{name}")
             ff = temp_file.name
         file = disnake.File(io.BytesIO(open(ff, "rb").read()), filename="e.png")
         embed.set_image(url=f"attachment://e.png")
