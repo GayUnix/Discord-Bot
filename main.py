@@ -8,6 +8,9 @@ import pyjokes;
 import requests;
 import re;
 import datetime;
+import html2image;
+import tempfile;
+import io;
 import bs4;
 import asyncio;
 
@@ -106,6 +109,33 @@ async def test(ctx):
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
 async def clear(ctx, number: int):
     return await ctx.channel.purge(limit=int(number) + 1)
+
+@client.command(name="render", description="to render a webpage as png")
+async def render(ctx, url: str ="e", viewport: str = "1280x1024"):
+    if ctx.message.attachments:
+        hti = html2image.Html2Image()
+        name = random.randint(0, 1000000000)
+        hti.screenshot_options = {'viewport': '1280x1024', 'fullPage': True}
+        embed = disnake.Embed(title="html to picture!!", color=disnake.Color.random())
+        with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+            hti.screenshot(html_str=await ctx.message.attachments[0].read(), save_as=temp_file.name + f"/code{name}")
+            ff = temp_file.name + f"/code{name}"
+            print(ff)
+        file = disnake.File(ff, filename="e.png")
+        embed.set_image(url=f"attachment://e.png")
+        await ctx.send(embed=embed, file=file)
+    else:
+        hti = html2image.Html2Image()
+        name = random.randint(0, 1000000000)
+        hti.screenshot_options = {'viewport': '1280x1024', 'fullPage': True}
+        embed = disnake.Embed(title="html to picture!!", color=disnake.Color.random())
+        hti.load_str(requests.get(url).text, f"code{name}.html")
+        with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
+            hti.screenshot(save_as=temp_file.name)
+            ff = temp_file.name
+        file = disnake.File(io.BytesIO(open(ff, "rb").read()), filename="e.png")
+        embed.set_image(url=f"attachment://e.png")
+        await ctx.send(file=file, embed=embed)
 
 @client.command(name="guess", description="guessing game :3")
 async def guess(ctx, max: int = 100):
