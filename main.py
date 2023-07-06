@@ -117,9 +117,9 @@ async def guess(ctx, max: int = 100):
     while True:
         e = await client.wait_for("message", check=check, timeout=60)
         if int(e.content) == n:
-            return await ctx.send(f"# {e.author} wins!!")
+            return await e.reply(f"# {e.author} wins!!")
 
-        await ctx.send("- more" if int(e.content) < n else "- less")
+        await e.reply("- more" if int(e.content) < n else "- less")
 
 @client.command(name="tictactoe", description="just to have fun playing tictactoe with friends :)")
 async def tictactoe(ctx, plyr: disnake.Member):
