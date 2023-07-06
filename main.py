@@ -7,7 +7,26 @@ import random
 import pyjokes;
 import requests;
 import datetime;
+import bs4;
 import asyncio;
+
+
+class waifu: 
+    def get(keyw): 
+        return {'neko': 'neko', 'shinobu': 'shinobu', 'megumin': 'megumin', 'bully': 'bullied', 'cuddle': 'cuddled', 'cry': 'cried', 'hug': 'hugged', 'awoo': 'awoo', 'kiss': 'kissed', 'lick': 'licked', 'pat': 'pat', 'smug': 'smugged', 'bonk': 'bonked', 'yeet': 'yeeted', 'blush': 'blushed', 'smile': 'smiled', 'wave': 'waved', 'highfive': 'highfived', 'handhold': 'handhold', 'nom': 'nomed', 'bite': 'bit', 'glomp': 'glomped', 'slap': 'slapped', 'kill': 'killed', 'kick': 'kicked', 'happy': 'happy', 'waifu': 'waifu', 'wink': 'winked', 'poke': 'poke', 'dance': 'danced', 'cringe': 'cringed'}[keyw], requests.get(f"https://api.waifu.pics/sfw/{keyw}").json()["url"]
+
+class ep:
+    def get(url) -> list:
+        html = requests.get(url).text
+        end_point, dependent, independent = [], [".png",".jpg",".wav",".jpeg",".json",".js",".php",".xml"], ["http://","https://","file://","php://","ftp://","./","../","/"]
+        for i in [idk.split("\\")[0] for idk in re.split(f"'|\"|,|\*|\n|[|]", html) if idk.split("\\")[0] != ""]:
+            if i:
+                for de in independent:
+                    if i.startswith(de): end_point.append(i)
+                for ind in dependent:
+                    if i.endswith(ind): end_point.append(f"{url}{i}" if i[0] == "/" else f"{url}/{i}")
+        return [f"{url}{idk}" if idk[0] == "/" else idk for idk in [item for item in end_point if item != []]]
+
 
 prefix: str                             =       "$GAY "
 
@@ -19,18 +38,31 @@ getAllMembers: list                     =       lambda client: list(set(sum([gui
 
 abc: dict                               =       {"music": {}}
 
-intents = disnake.Intents().all()
+intents                                 =       disnake.Intents().all()
 
-client = commands.Bot(command_prefix=prefix, intents=intents)
+client                                  =       commands.Bot(command_prefix=prefix, intents=intents)
 
-class waifu: 
-    def get(keyw): 
-        return {'neko': 'neko', 'shinobu': 'shinobu', 'megumin': 'megumin', 'bully': 'bullied', 'cuddle': 'cuddled', 'cry': 'cried', 'hug': 'hugged', 'awoo': 'awoo', 'kiss': 'kissed', 'lick': 'licked', 'pat': 'pat', 'smug': 'smugged', 'bonk': 'bonked', 'yeet': 'yeeted', 'blush': 'blushed', 'smile': 'smiled', 'wave': 'waved', 'highfive': 'highfived', 'handhold': 'handhold', 'nom': 'nomed', 'bite': 'bit', 'glomp': 'glomped', 'slap': 'slapped', 'kill': 'killed', 'kick': 'kicked', 'happy': 'happy', 'waifu': 'waifu', 'wink': 'winked', 'poke': 'poke', 'dance': 'danced', 'cringe': 'cringed'}[keyw], requests.get(f"https://api.waifu.pics/sfw/{keyw}").json()["url"]
+youtube: list                           =       lambda keyword: youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result']
+
+spotify_search: list                    =       lambda link: [i for i in ep.get(link) if "/track/" in i]
+
+name: str                               =       lambda link: bs4.BeautifulSoup(requests.get(link.split('?')[0]).text, 'html.parser').title.string.split(" | ")[0]
 
 def yt_search(keyword: str) -> tuple:
     idk, YDL_OPTIONS = youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result'][0], {'format': 'bestaudio/best', 'noplaylist':'True'}
     with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl: meta:dict = ydl.extract_info(idk["link"], download=False)
     return idk["link"], idk["title"][0:80], meta['url'], idk['thumbnails'][0]['url'].split('?')[0], idk['duration'], idk['viewCount']['short'], idk['descriptionSnippet'][0]['text'][0:2048]
+
+def get(url) -> list:
+    html = requests.get(url).text
+    end_point, dependent, independent = [], [".png",".jpg",".wav",".jpeg",".json",".js",".php",".xml"], ["http://","https://","file://","php://","ftp://","./","../","/"]
+    for i in [idk.split("\\")[0] for idk in re.split(f"'|\"|,|\*|\n|[|]", html) if idk.split("\\")[0] != ""]:
+        if i:
+            for de in independent:
+                if i.startswith(de): end_point.append(i)
+            for ind in dependent:
+                if i.endswith(ind): end_point.append(f"{url}{i}" if i[0] == "/" else f"{url}/{i}")
+    return [f"{url}{idk}" if idk[0] == "/" else idk for idk in [item for item in end_point if item != []]]
 
 def print_board(board):
     formatted_board = ""
@@ -80,44 +112,30 @@ async def tictactoe(ctx, plyr):
     random.shuffle(e)
     players = {e[0]: ctx.author, e[1]: plyr}
     current_player = e[0]
-
     message = await ctx.send(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
-
     def check(msg):
         return msg.author == players[current_player] and msg.channel == ctx.channel
-
     while True:
         try:
             e = await client.wait_for("message", check=check, timeout=60)
             if any([u in e.content for u in ["end", "finish", "leave", "quit"]]):
-                print([0][10])
+                return ctx.send("> Exiting...")
             row, col = [int(i) - 1 for i in e.content.split()[-1].split(".")]
-
             if 0 <= row <= 2 and 0 <= col <= 2:
                 if board[row][col] == " ":
                     board[row][col] = current_player
-
                     winner = check_winner(board)
                     if winner:
                         await message.edit(content=f"```\n{print_board(board)}\n```\n# Player {players[winner]} wins!")
                         break
-
-                    if current_player == "X":
-                        current_player = "O"
-                    else:
-                        current_player = "X"
+                    current_player = "O" if current_player == "X" else "X"
                 else:
                     await ctx.send("Invalid move. Try again.")
             else:
                 await ctx.send("Invalid input. Row and column should be in the range 1..3.")
-
             await message.edit(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
-
         except ValueError:
             await ctx.send("Invalid input. Please enter a valid row and column.")
-        except IndexError:
-            await ctx.send("> exiting...")
-            break
         except asyncio.TimeoutError:
             await ctx.send("> Game timed out. Exiting.")
             break
@@ -377,5 +395,37 @@ async def resume(interaction):
     if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_paused():
         interaction.guild.voice_client.resume()
         return await interaction.reply("> noice :D")
+
+@client.slash_command(name="spotify", description="play a playlist from spotify")
+async def spotify(interaction, playlist: str, shuffle: bool = False):
+    if interaction.author.voice and interaction.guild.voice_client.is_connected():
+        spot_msg, event, songs = await interaction.send("> gimme 1sec"), asyncio.Event(), spotify_search(playlist)
+        event.set()
+        if not shuffle: random.shuffle(songs)
+        spot_msg = await interaction.channel.send("Null")
+        for _ in songs:
+            await event.wait()
+            event.clear()
+            url, name, music, pic, duration, vview, description = yt_search(_)
+            resume, pause, skip, urlb = Button(label="resume", style=disnake.ButtonStyle.green), Button(label="pause", style=disnake.ButtonStyle.danger), Button(label="skip", style=disnake.ButtonStyle.primary), Button(label=name, url=url)
+            async def resumef(interaction): 
+                if interaction.author.voice and interaction.guild.voice_client.is_connected():
+                    interaction.guild.voice_client.resume()
+                    await interaction.send("> noice :D")
+            async def pausef(interaction): 
+                if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_playing():
+                    interaction.guild.voice_client.pause()
+                    await interaction.send("> paused!")
+            async def skipf(interaction): 
+                if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_playing():
+                    interaction.guild.voice_client.stop()
+                    await interaction.send("> stopped :/")
+            resume.callback, pause.callback, skip.callback, view = resumef, pausef, skipf, View()
+            for b in [resume, pause, skip, urlb]:
+                view.add_item(b)
+            embed = disnake.Embed(title=name, description=f"**{description}**\n{duration}\t|\t{vview}\n", color=disnake.Color.red(), url=url)
+            embed.set_image(url=pic)
+            await interaction.followup.send(embed=embed, view=view)
+            interaction.guild.voice_client.play(await disnake.FFmpegOpusAudio.from_probe(music, **FFMPEG_OPTIONS))
 
 client.run("MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA")
