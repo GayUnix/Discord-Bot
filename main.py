@@ -146,6 +146,8 @@ async def guess(ctx, max: int = 100):
     while True:
         try:
             e = await client.wait_for("message", check=check, timeout=60)
+            if any([u in e.content for u in ["leave", "quit"]]):
+                return ctx.send("> Exiting...")
             if int(e.content) == n:
                 return await e.reply(f"# {e.author} wins!!")
 
