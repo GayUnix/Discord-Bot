@@ -107,8 +107,22 @@ async def test(ctx):
 async def clear(ctx, number: int):
     return await ctx.channel.purge(limit=int(number) + 1)
 
+@client.command(name="guess", description="guessing game :3")
+async def guess(ctx, max: int = 100):
+    def check(msg):
+        return msg.channel == ctx.channel and msg.content.isnumeric()
+
+    n = random.randint(0, max)
+    ctx.send(f"## starting the guessing (min: 0, max: {max})")
+    while True:
+        e = await client.wait_for("message", check=check, timeout=60)
+        if int(e.content) == n:
+            return await ctx.send(f"# {e.author} win!!")
+
+        await ctx.send("- more" if int(e.content) < n else "- less")
+
 @client.command(name="tictactoe", description="just to have fun playing tictactoe with friends :)")
-async def tictactoe(ctx, plyr):
+async def tictactoe(ctx, plyr: disnake.Member):
     board = [[" ", " ", " "] for _ in range(3)]
     e = ["X", "O"]
     random.shuffle(e)
@@ -116,7 +130,7 @@ async def tictactoe(ctx, plyr):
     current_player = e[0]
     message = await ctx.send(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
     def check(msg):
-        return msg.author == players[current_player] and msg.channel == ctx.channel
+        return msg.member == players[current_player] and msg.channel == ctx.channel
     while True:
         try:
             e = await client.wait_for("message", check=check, timeout=60)
