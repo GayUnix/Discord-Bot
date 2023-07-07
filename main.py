@@ -3,12 +3,14 @@ import disnake;
 from disnake.ui import Button, View;
 import youtubesearchpython;
 import yt_dlp;
+import datetime;
 import random
 import pyjokes;
 import requests;
 import re;
 import datetime;
-import easy_pil;
+from PIL import Image, ImageDraw, ImageFont;
+import io;
 import json;
 import bs4;
 import asyncio;
@@ -56,6 +58,47 @@ def yt_search(keyword: str) -> tuple:
     idk, YDL_OPTIONS = youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result'][0], {'format': 'bestaudio/best', 'noplaylist':'True'}
     with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl: meta:dict = ydl.extract_info(idk["link"], download=False)
     return idk["link"], idk["title"][0:80], meta['url'], idk['thumbnails'][0]['url'].split('?')[0], idk['duration'], idk['viewCount']['short'], idk['descriptionSnippet'][0]['text'][0:2048]
+
+def apply_circular_mask(image):
+    width, height = image.size
+    mask = Image.new('L', (width, height), 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse((0, 0, width, height), fill=255)
+    result = Image.new('RGBA', (width, height))
+    result.paste(image, mask=mask)
+    return result
+
+def create_welcome_image(background, profile, text, username):
+    background = background.convert('RGBA').resize((int(1280*1), int(800*1)), resample=Image.LANCZOS)
+    profile_picture = profile.convert('RGBA')
+    profile_picture.thumbnail((profile_picture.width/2, profile_picture.height/2), resample=Image.LANCZOS)
+    profile_picture = apply_circular_mask(profile_picture)
+    profile_picture = profile_picture.resize((170, 170), Image.LANCZOS)
+    x = (background.width - profile_picture.width) // 2
+    y = (background.height - profile_picture.height) // 2
+    background.paste(profile_picture, (x, y - 70), profile_picture)
+    max_username_width = background.width - 20
+    username_font_size = 40
+    username_font = ImageFont.truetype("./Poppins-Light.ttf", username_font_size)
+    max_welcome_width = background.width - 20
+    welcome_font_size = 70
+    welcome_font = ImageFont.truetype("./Poppins-Bold.ttf", welcome_font_size)
+    draw = ImageDraw.Draw(background)
+    neg_color = tuple(255 - value for value in background.getpixel((0, 0)))
+    welcome_text_width, welcome_text_height = draw.textsize(text, font=welcome_font)
+    welcome_text_x = background.width // 2
+    welcome_text_y = y + profile_picture.height + 20
+    while draw.textsize(text, font=welcome_font)[0] > max_welcome_width:
+        welcome_font_size -= 1
+        welcome_font = ImageFont.truetype("./Poppins-Bold.ttf", welcome_font_size)
+    draw.text((welcome_text_x, welcome_text_y), text, fill=neg_color, font=welcome_font, anchor="mm")
+    username_text_x = background.width // 2
+    username_text_y = y + profile_picture.height + 120
+    while draw.textsize(username, font=username_font)[0] > max_username_width:
+        username_font_size -= 1
+        username_font = ImageFont.truetype("./Poppins-Light.ttf", min(welcome_font_size - 30, username_font_size))
+    draw.text((username_text_x, username_text_y), username, fill=neg_color, font=username_font, anchor="mm")
+    return background
 
 def get(url) -> list:
     html = requests.get(url).text
@@ -456,22 +499,34 @@ async def spotify(interaction, playlist: str, shuffle: bool = False):
 async def on_member_join(member):
     channel = member.guild.system_channel
     wallpapers = json.loads(open("wallpapers.json", 'r').read())
-    def e(_=""):
-        _ = _ or random.choice(wallpapers)
-        return _ if requests.get(_).status_code else e(random.choice(wallpapers))
-    image = await easy_pil.load_image_async(e())
-    background = easy_pil.Editor(image)
-    pfp = await easy_pil.load_image_async(str(member.avatar.url))
-    profile = easy_pil.Editor(pfp).resize((150, 150)).circle_image()
-    poppins = easy_pil.Font.poppins(size=30, variant="bold")
-    poppins_small = easy_pil.Font.poppins(size=20, variant="light")
-    background.paste(profile, (325, 90))
-    background.ellipse((325, 90), 150, 150, outline="white", stroke_width=4)
-    background.text((400, 260), f"Welcome To {member.guild.name}", color="white", font=poppins, align="center")
-    background.text((400, 325), f"{member.name}", color="white", font=poppins_small, align="center")
-    file = disnake.File(fp=background.image_bytes, filename="welcome.jpg")
-    embed = disnake.Embed(title=f"Welcome {member.name}!!", description=f"> I hope you feel the radiance in the `{member.guild.name}` server :D", color=disnake.Color.green())
-    embed.set_image(url=f"attachment://welcome.jpg")
+    def get_valid_wallpaper():
+        wallpaper = random.choice(wallpapers)
+        response = requests.get(wallpaper)
+        return wallpaper if response.status_code == 200 else get_valid_wallpaper()
+    wallpaper_url = get_valid_wallpaper()
+    back_response = requests.get(wallpaper_url, stream=True)
+    back_response.raise_for_status()
+    profile_response = requests.get(str(member.avatar.url), stream=True)
+    profile_response.raise_for_status()
+    background = create_welcome_image(
+        Image.open(io.BytesIO(back_response.content)),
+        Image.open(io.BytesIO(profile_response.content)),
+        f"Welcome To {member.guild.name}!!",
+        str(member.name)
+    )
+    file_bytes = io.BytesIO()
+    background.save(file_bytes, format='PNG')
+    file_bytes.seek(0)
+    file = disnake.File(fp=file_bytes, filename="welcome.png")
+    embed = disnake.Embed(
+        title=f"Welcome {member.name}!!",
+        description=f"I hope you feel the radiance in the `{member.guild.name}` server :3",
+        color=disnake.Color.green(),
+        timestamp=datetime.datetime.utcnow()
+    )
+    embed.set_footer(text=pyjokes.get_joke())
+    embed.set_image(url=f"attachment://welcome.png")
     await channel.send(embed=embed, file=file)
+
 
 client.run("MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA")
