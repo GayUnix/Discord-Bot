@@ -8,9 +8,8 @@ import pyjokes;
 import requests;
 import re;
 import datetime;
-import html2image;
-import tempfile;
-import io;
+import easy_pil;
+import json;
 import bs4;
 import asyncio;
 
@@ -109,32 +108,6 @@ async def test(ctx):
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
 async def clear(ctx, number: int):
     return await ctx.channel.purge(limit=int(number) + 1)
-
-# @client.command(name="render", description="to render a webpage as png")
-# async def render(ctx, url: str ="e", viewport: str = "1280x1024"):
-#     if ctx.message.attachments:
-#         hti = html2image.Html2Image()
-#         name = random.randint(0, 1000000000)
-#         hti.screenshot_options = {'viewport': '1280x1024', 'fullPage': True}
-#         embed = disnake.Embed(title="html to picture!!", color=disnake.Color.random())
-#         with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
-#             hti.screenshot(html_str=await ctx.message.attachments[0].read(), save_as=temp_file.name + f"/code{name}")
-#             ff = temp_file.name + f"/code{name}"
-#             print(ff)
-#         file = disnake.File(ff, filename="e.png")
-#         embed.set_image(url=f"attachment://e.png")
-#         await ctx.send(embed=embed, file=file)
-#     else:
-#         hti = html2image.Html2Image()
-#         name = random.randint(0, 1000000000)
-#         hti.screenshot_options = {'viewport': '1280x1024', 'fullPage': True}
-#         embed = disnake.Embed(title="html to picture!!", color=disnake.Color.random())
-#         with tempfile.NamedTemporaryFile(suffix='.png') as temp_file:
-#             hti.screenshot(html_str=requests.get(url).text, save_as=temp_file.name + f"/code{name}")
-#             ff = temp_file.name
-#         file = disnake.File(io.BytesIO(open(ff, "rb").read()), filename="e.png")
-#         embed.set_image(url=f"attachment://e.png")
-#         await ctx.send(file=file, embed=embed)
 
 @client.command(name="guess", description="guessing game :3")
 async def guess(ctx, max: int = 100):
@@ -478,5 +451,27 @@ async def spotify(interaction, playlist: str, shuffle: bool = False):
             embed.set_image(url=pic)
             await interaction.followup.send(embed=embed, view=view)
             interaction.guild.voice_client.play(await disnake.FFmpegOpusAudio.from_probe(music, **FFMPEG_OPTIONS))
+
+@client.event
+async def on_member_join(member):
+    channel = member.guild.system_channel
+    wallpapers = json.loads(open("wallpapers.json", 'r').read())
+    def e(_=""):
+        _ = _ or random.choice(wallpapers)
+        return _ if requests.get(_).status_code else e(random.choice(wallpapers))
+    image = await easy_pil.load_image_async(e())
+    background = easy_pil.Editor(image)
+    pfp = await easy_pil.load_image_async(str(member.avatar.url))
+    profile = easy_pil.Editor(pfp).resize((150, 150)).circle_image()
+    poppins = easy_pil.Font.poppins(size=50, variant="bold")
+    poppins_small = easy_pil.Font.poppins(size=20, variant="light")
+    background.paste(profile, (325, 90))
+    background.ellipse((325, 90), 150, 150, outline="white", stroke_width=4)
+    background.text((400, 260), f"Welcome To {member.guild.name}", color="white", font=poppins, align="center")
+    background.text((400, 325), f"{member.name}", color="white", font=poppins_small, align="center")
+    file = disnake.File(fp=background.image_bytes, filename="welcome.jpg")
+    embed = disnake.Embed(title=f"Welcome {member.name}!!", description=f"> I hope you feel the radiance in the `{member.guild.name}` server :D", color=disnake.Color.green())
+    embed.set_image(url=f"attachment://welcome.png")
+    await channel.send(embed=embed, file=file)
 
 client.run("MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA")
