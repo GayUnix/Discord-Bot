@@ -463,7 +463,7 @@ async def on_member_join(member):
     background = easy_pil.Editor(image)
     pfp = await easy_pil.load_image_async(str(member.avatar.url))
     profile = easy_pil.Editor(pfp).resize((150, 150)).circle_image()
-    poppins = easy_pil.Font.poppins(size=50, variant="bold")
+    poppins = easy_pil.Font.poppins(size=30, variant="bold")
     poppins_small = easy_pil.Font.poppins(size=20, variant="light")
     background.paste(profile, (325, 90))
     background.ellipse((325, 90), 150, 150, outline="white", stroke_width=4)
@@ -471,7 +471,7 @@ async def on_member_join(member):
     background.text((400, 325), f"{member.name}", color="white", font=poppins_small, align="center")
     file = disnake.File(fp=background.image_bytes, filename="welcome.jpg")
     embed = disnake.Embed(title=f"Welcome {member.name}!!", description=f"> I hope you feel the radiance in the `{member.guild.name}` server :D", color=disnake.Color.green())
-    embed.set_image(url=f"attachment://welcome.png")
+    embed.set_image(url=f"attachment://welcome.jpg")
     await channel.send(embed=embed, file=file)
 
 client.run("MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA")
