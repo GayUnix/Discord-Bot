@@ -151,11 +151,12 @@ async def on_ready():
         meme = e()
         embed = disnake.Embed(title=meme["title"], color=disnake.Color.random())
         embed.set_image(meme["url_overridden_by_dest"])
-        newmeme = Button(label="resume", style=disnake.ButtonStyle.green)
+        newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         async def newmemef(interaction): 
             await interaction.response.defer()
             memee = e()
             embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+            embed.set_footer(text=f"requested by {interaction.author.name}")
             embed.set_image(memee["url_overridden_by_dest"])
             newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
             newmeme.callback = newmemef
@@ -179,16 +180,18 @@ async def meme(ctx):
     memee = e()
     embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
     embed.set_image(memee["url_overridden_by_dest"])
-    newmeme = Button(label="resume", style=disnake.ButtonStyle.green)
+    newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
     async def newmemef(interaction): 
         await interaction.response.defer()
         memee = e()
         embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
         embed.set_image(memee["url_overridden_by_dest"])
+        embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
         view = View()
         view.add_item(newmeme)
+        embed.set_footer()
         return await interaction.send(embed=embed, view=view)
     newmeme.callback = newmemef
     view = View()
@@ -302,12 +305,13 @@ async def meme(interaction):
     memee = e()
     embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
     embed.set_image(memee["url_overridden_by_dest"])
-    newmeme = Button(label="resume", style=disnake.ButtonStyle.green)
+    newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
     async def newmemef(interaction): 
         await interaction.response.defer()
         memee = e()
         embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
         embed.set_image(memee["url_overridden_by_dest"])
+        embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
         view = View()
