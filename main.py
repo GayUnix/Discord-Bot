@@ -151,8 +151,21 @@ async def on_ready():
         meme = e()
         embed = disnake.Embed(title=meme["title"], color=disnake.Color.random())
         embed.set_image(meme["url_overridden_by_dest"])
+        async def newmemef(interaction): 
+            await interaction.response.defer()
+            memee = e()
+            embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+            embed.set_image(memee["url_overridden_by_dest"])
+            newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
+            newmeme.callback = newmemef
+            view = View()
+            view.add_item(newmeme)
+            return await interaction.send(embed=embed, view=view)
+        newmeme.callback = newmemef
+        view = View()
+        view.add_item(newmeme)
         for channel in meme_channels:
-            await channel.send(embed=embed)
+            await channel.send(embed=embed, view=view)
         await asyncio.sleep(60*60)
 
 
@@ -165,7 +178,21 @@ async def meme(ctx):
     memee = e()
     embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
     embed.set_image(memee["url_overridden_by_dest"])
-    return await ctx.send(embed=embed)
+    newmeme = Button(label="resume", style=disnake.ButtonStyle.green)
+    async def newmemef(interaction): 
+        await interaction.response.defer()
+        memee = e()
+        embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+        embed.set_image(memee["url_overridden_by_dest"])
+        newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
+        newmeme.callback = newmemef
+        view = View()
+        view.add_item(newmeme)
+        return await interaction.send(embed=embed, view=view)
+    newmeme.callback = newmemef
+    view = View()
+    view.add_item(newmeme)
+    return await ctx.send(embed=embed, view=view)
 
 @client.command(name="test", description="To test if the bot is still working")
 async def test(ctx):
@@ -270,10 +297,25 @@ async def joke(interaction):
 
 @client.slash_command(name="meme", description="Sends a coding meme")
 async def meme(interaction):
+    await interaction.response.defer()
     memee = e()
     embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
     embed.set_image(memee["url_overridden_by_dest"])
-    return await interaction.send(embed=embed)
+    newmeme = Button(label="resume", style=disnake.ButtonStyle.green)
+    async def newmemef(interaction): 
+        await interaction.response.defer()
+        memee = e()
+        embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+        embed.set_image(memee["url_overridden_by_dest"])
+        newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
+        newmeme.callback = newmemef
+        view = View()
+        view.add_item(newmeme)
+        return await interaction.send(embed=embed, view=view)
+    newmeme.callback = newmemef
+    view = View()
+    view.add_item(newmeme)
+    return await interaction.send(embed=embed, view=view)
 
 @client.slash_command(name="test", description="To test if the bot is still working")
 async def test(interaction):
