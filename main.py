@@ -35,7 +35,7 @@ class ep:
 
 prefix: str                             =       "$GAY "
 
-token: str                              =       "ODIzOTgxMjQ0NDk2MzQ3MTY3.GK1Lak.pKIDUCbeuIdeI5WVp4wu5toZYnkCNUDBhbLxFQ"
+token: str                              =       "MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA"
 
 FFMPEG_OPTIONS: dict                    =       {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5','options': '-vn'}
 
@@ -560,4 +560,4 @@ async def on_member_join(member):
     await channel.send(embed=embed, file=file)
 
 
-client.run("MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA")
+client.run(token)
