@@ -151,6 +151,7 @@ async def on_ready():
         meme = e()
         embed = disnake.Embed(title=meme["title"], color=disnake.Color.random())
         embed.set_image(meme["url_overridden_by_dest"])
+        newmeme = Button(label="resume", style=disnake.ButtonStyle.green)
         async def newmemef(interaction): 
             await interaction.response.defer()
             memee = e()
