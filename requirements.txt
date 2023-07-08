@@ -31,5 +31,4 @@ youtube-search-python==1.6.6
 yt-dlp==2023.6.22
 zope.interface==6.0
 bs4==0.0.1
-html2image==2.0.3
 Pillow==9.5.0

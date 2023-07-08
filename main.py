@@ -134,10 +134,27 @@ def check_winner(board):
 
     return None
 
+def e():
+    _ = requests.get("https://reddit.com/r/programminghumor.json")
+    if _.status_code == 200:
+        __ = random.choice(_.json()["data"]["children"])
+        return __["data"] if "url_overridden_by_dest" in __["data"] else e()
+    else:
+        return e()
+
 @client.event
 async def on_ready():
     print(f"Logged in as {client.user}!")
     await client.change_presence(activity=disnake.Streaming(name="💻VisualStudio Code", url="https://github.com/NacreousDawn596"))
+    meme_channels = sum([[channel for channel in guild.text_channels if "meme" in channel.name] for guild in client.guilds], [])
+    while True:
+        meme = e()
+        embed = disnake.Embed(title=meme["title"], color=disnake.Color.random())
+        embed.set_image(meme["url_overridden_by_dest"])
+        for channel in meme_channels:
+            await channel.send(embed=embed)
+        await asyncio.sleep(60*60)
+
 
 @client.command(name="joke", description="Sends a coding joke")
 async def joke(ctx):
