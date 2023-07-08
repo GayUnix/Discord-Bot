@@ -160,6 +160,13 @@ async def on_ready():
 async def joke(ctx):
     return await ctx.send(f"> {pyjokes.get_joke()}")
 
+@client.command(name="meme", description="Sends a coding meme")
+async def meme(ctx):
+    memee = e()
+    embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+    embed.set_image(memee["url_overridden_by_dest"])
+    return await ctx.send(embed=embed)
+
 @client.command(name="test", description="To test if the bot is still working")
 async def test(ctx):
     return await ctx.send("- tested")
@@ -260,6 +267,13 @@ async def ping(ctx):
 @client.slash_command(name="joke", description="Sends a coding joke")
 async def joke(interaction):
     return await interaction.send(f"> {pyjokes.get_joke()}")
+
+@client.slash_command(name="meme", description="Sends a coding meme")
+async def meme(interaction):
+    memee = e()
+    embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+    embed.set_image(memee["url_overridden_by_dest"])
+    return await interaction.send(embed=embed)
 
 @client.slash_command(name="test", description="To test if the bot is still working")
 async def test(interaction):
