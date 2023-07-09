@@ -134,9 +134,19 @@ def check_winner(board):
 
     return None
 
-def e(t):
-    _ = requests.get(f"https://reddit.com/r/{t}.json")
-    return random.choice([__ for __ in _.json()["data"]["children"] if "url_overridden_by_dest" in __["data"]]) if _.status_code == 200 else e()
+def I_hate_when_I_am_coding(url) -> list:
+    html = requests.get(url).text
+    end_point, dependent, independent = [], [".png",".jpg",".wav",".jpeg",".json",".js",".php",".xml"], ["http://","https://","file://","php://","ftp://","./","../","/"]
+    for i in [idk.split("\\")[0] for idk in re.split(f"'|\"|,|\*|\n|[|]", html) if idk.split("\\")[0] != ""]:
+        if i:
+            for de in independent:
+                if i.startswith(de): end_point.append(i)
+            for ind in dependent:
+                if i.endswith(ind): end_point.append(f"{url}{i}" if i[0] == "/" else f"{url}/{i}")
+    return [item for item in end_point if item != []]
+
+def e():
+    return random.choice([f for f in I_hate_when_I_am_coding(f"https://programmerhumor.io/page/{str(random.randint(1, 1960))}/") if f.endswith(".jpg") and "icon" not in f])
 
 @client.event
 async def on_ready():
@@ -144,16 +154,16 @@ async def on_ready():
     await client.change_presence(activity=disnake.Streaming(name="💻VisualStudio Code", url="https://github.com/NacreousDawn596"))
     meme_channels = sum([[channel for channel in guild.text_channels if "meme" in channel.name] for guild in client.guilds], [])
     while True:
-        memee = random.choice(e("programminghumor"), e("memes"))
-        embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
-        embed.set_image(memee["url_overridden_by_dest"])
+        memee = e()
+        embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
+        embed.set_image(memee)
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         async def newmemef(interaction): 
             await interaction.response.defer()
             memee = e()
-            embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
+            embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
             embed.set_footer(text=f"requested by {interaction.author.name}")
-            embed.set_image(memee["url_overridden_by_dest"])
+            embed.set_image(memee)
             newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
             newmeme.callback = newmemef
             view = View()
@@ -173,15 +183,15 @@ async def joke(ctx):
 
 @client.command(name="meme", description="Sends a coding meme")
 async def meme(ctx):
-    memee = random.choice(e("programminghumor"), e("memes"))
-    embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
-    embed.set_image(memee["url_overridden_by_dest"])
+    memee = e()
+    embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
+    embed.set_image(memee)
     newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
     async def newmemef(interaction): 
         await interaction.response.defer()
-        memee = random.choice(e("programminghumor"), e("memes"))
-        embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
-        embed.set_image(memee["url_overridden_by_dest"])
+        memee = e()
+        embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
+        embed.set_image(memee)
         embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
@@ -298,15 +308,15 @@ async def joke(interaction):
 @client.slash_command(name="meme", description="Sends a coding meme")
 async def meme(interaction):
     await interaction.response.defer()
-    memee = random.choice(e("programminghumor"), e("memes"))
-    embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
-    embed.set_image(memee["url_overridden_by_dest"])
+    memee = e()
+    embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
+    embed.set_image(memee)
     newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
     async def newmemef(interaction): 
         await interaction.response.defer()
-        memee = random.choice(e("programminghumor"), e("memes"))
-        embed = disnake.Embed(title=memee["title"], color=disnake.Color.random())
-        embed.set_image(memee["url_overridden_by_dest"])
+        memee = e()
+        embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
+        embed.set_image(memee)
         embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
