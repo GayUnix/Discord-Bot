@@ -20,26 +20,11 @@ class waifu:
     def get(keyw): 
         return {'neko': 'neko', 'shinobu': 'shinobu', 'megumin': 'megumin', 'bully': 'bullied', 'cuddle': 'cuddled', 'cry': 'cried', 'hug': 'hugged', 'awoo': 'awoo', 'kiss': 'kissed', 'lick': 'licked', 'pat': 'pat', 'smug': 'smugged', 'bonk': 'bonked', 'yeet': 'yeeted', 'blush': 'blushed', 'smile': 'smiled', 'wave': 'waved', 'highfive': 'highfived', 'handhold': 'handhold', 'nom': 'nomed', 'bite': 'bit', 'glomp': 'glomped', 'slap': 'slapped', 'kill': 'killed', 'kick': 'kicked', 'happy': 'happy', 'waifu': 'waifu', 'wink': 'winked', 'poke': 'poke', 'dance': 'danced', 'cringe': 'cringed'}[keyw], requests.get(f"https://api.waifu.pics/sfw/{keyw}").json()["url"]
 
-class ep:
-    def get(url) -> list:
-        html = requests.get(url).text
-        end_point, dependent, independent = [], [".png",".jpg",".wav",".jpeg",".json",".js",".php",".xml"], ["http://","https://","file://","php://","ftp://","./","../","/"]
-        for i in [idk.split("\\")[0] for idk in re.split(f"'|\"|,|\*|\n|[|]", html) if idk.split("\\")[0] != ""]:
-            if i:
-                for de in independent:
-                    if i.startswith(de): end_point.append(i)
-                for ind in dependent:
-                    if i.endswith(ind): end_point.append(f"{url}{i}" if i[0] == "/" else f"{url}/{i}")
-        return [f"{url}{idk}" if idk[0] == "/" else idk for idk in [item for item in end_point if item != []]]
-
-
 prefix: str                             =       "$GAY "
 
 token: str                              =       "MTEyNjMyODA5NDU0MjgxMTE0Ng.GrZlnr.EYjREaT6DrFYgikho66rn-OLVPzX9Pgy2ZC3SA"
 
 FFMPEG_OPTIONS: dict                    =       {'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5','options': '-vn'}
-
-getAllMembers: list                     =       lambda client: list(set(sum([guild.members for guild in client.guilds], [])))
 
 abc: dict                               =       {"music": {}}
 
@@ -47,12 +32,11 @@ intents                                 =       disnake.Intents().all()
 
 client                                  =       commands.Bot(command_prefix=prefix, intents=intents)
 
-youtube: list                           =       lambda keyword: youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result']
-
-spotify_search: list                    =       lambda link: [i for i in ep.get(link) if "/track/" in i]
-
-def nnname(link: str) -> str:
-    return bs4.BeautifulSoup(requests.get(link.split('?')[0]).text, 'html.parser').title.string.split(" | ")[0]
+def distrowatch(distro):
+    soup = bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")
+    titles = soup.find("td", {"class": "TablesTitle"})
+    data = {j.find("a").text: j.find("b").text for j in titles.find("ul").find_all("li")}
+    return {data[i]: i for i in list(set(data))[::-1]}, titles.text.splitlines()[-3]
 
 def yt_search(keyword: str) -> tuple:
     idk, YDL_OPTIONS = youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result'][0], {'format': 'bestaudio/best', 'noplaylist':'True'}
@@ -100,17 +84,6 @@ def create_welcome_image(background, profile, text, username):
     draw.text((username_text_x, username_text_y), username, fill=neg_color, font=username_font, anchor="mm")
     return background
 
-def get(url) -> list:
-    html = requests.get(url).text
-    end_point, dependent, independent = [], [".png",".jpg",".wav",".jpeg",".json",".js",".php",".xml"], ["http://","https://","file://","php://","ftp://","./","../","/"]
-    for i in [idk.split("\\")[0] for idk in re.split(f"'|\"|,|\*|\n|[|]", html) if idk.split("\\")[0] != ""]:
-        if i:
-            for de in independent:
-                if i.startswith(de): end_point.append(i)
-            for ind in dependent:
-                if i.endswith(ind): end_point.append(f"{url}{i}" if i[0] == "/" else f"{url}/{i}")
-    return [f"{url}{idk}" if idk[0] == "/" else idk for idk in [item for item in end_point if item != []]]
-
 def print_board(board):
     formatted_board = ""
     for row in board:
@@ -146,7 +119,14 @@ def I_hate_when_I_am_coding(url) -> list:
     return [item for item in end_point if item != []]
 
 def e():
-    return random.choice([f for f in I_hate_when_I_am_coding(f"https://programmerhumor.io/page/{str(random.randint(1, 1960))}/") if f.endswith(".jpg") and "icon" not in f])
+    r = random.choice([f for f in I_hate_when_I_am_coding(f"https://programmerhumor.io/page/{str(random.randint(1, 1960))}/") if f.endswith(".jpg") and "icon" not in f])
+    return r if requests.get(r).status_code == 200 else e()
+
+def distrowatch(distro):
+    soup = bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")
+    titles = soup.find("td", {"class": "TablesTitle"})
+    data = {j.find("a").text: j.find("b").text for j in titles.find("ul").find_all("li")}
+    return {data[i]: i for i in list(set(data))[::-1]}, titles.text.splitlines()[-3]
 
 @client.event
 async def on_ready():
@@ -180,6 +160,17 @@ async def on_ready():
 @client.command(name="joke", description="Sends a coding joke")
 async def joke(ctx):
     return await ctx.send(f"> {pyjokes.get_joke()}")
+    
+@client.command(name="distro", description="get distrowatch info")
+async def distro(ctx, os):
+    description, data = distrowatch(os)
+    embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
+    for i in data:
+        embed.add_field(name= i, value= data[i], inline=False)
+    view = View()
+    redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
+    view.add_item(redirect)
+    await ctx.send(embed, view)
 
 @client.command(name="meme", description="Sends a coding meme")
 async def meme(ctx):
@@ -353,6 +344,18 @@ async def git(interaction, user: str):
         embed.add_field(name=f"{key}:", value=data[key], inline=True)
     view.add_item(button)
     return await interaction.followup.send(embed=embed, view=view)
+
+@client.slash_command(name="distro", description="get distrowatch info")
+async def distro(interaction, os):
+    await interaction.response.defer()
+    description, data = distrowatch(os)
+    embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
+    for i in data:
+        embed.add_field(name= i, value= data[i], inline=False)
+    view = View()
+    redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
+    view.add_item(redirect)
+    await interaction.followup.send(embed, view)
 
 @client.slash_command(name="urban", description="To get a definition from the urban dictionnary")
 async def urban(interaction, word:str, times: int = 3):
@@ -546,38 +549,6 @@ async def resume(interaction):
     if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_paused():
         interaction.guild.voice_client.resume()
         return await interaction.reply("> noice :D")
-
-@client.slash_command(name="spotify", description="play a playlist from spotify")
-async def spotify(interaction, playlist: str, shuffle: bool = False):
-    if interaction.author.voice and interaction.guild.voice_client.is_connected():
-        spot_msg, event, songs = await interaction.send("> gimme 1sec"), asyncio.Event(), spotify_search(playlist)
-        event.set()
-        if not shuffle: random.shuffle(songs)
-        spot_msg = await interaction.channel.send("Null")
-        for _ in songs:
-            await event.wait()
-            event.clear()
-            url, name, music, pic, duration, vview, description = yt_search(nnname(_))
-            resume, pause, skip, urlb = Button(label="resume", style=disnake.ButtonStyle.green), Button(label="pause", style=disnake.ButtonStyle.danger), Button(label="skip", style=disnake.ButtonStyle.primary), Button(label=name, url=url)
-            async def resumef(interaction): 
-                if interaction.author.voice and interaction.guild.voice_client.is_connected():
-                    interaction.guild.voice_client.resume()
-                    await interaction.send("> noice :D")
-            async def pausef(interaction): 
-                if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_playing():
-                    interaction.guild.voice_client.pause()
-                    await interaction.send("> paused!")
-            async def skipf(interaction): 
-                if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_playing():
-                    interaction.guild.voice_client.stop()
-                    await interaction.send("> stopped :/")
-            resume.callback, pause.callback, skip.callback, view = resumef, pausef, skipf, View()
-            for b in [resume, pause, skip, urlb]:
-                view.add_item(b)
-            embed = disnake.Embed(title=name, description=f"**{description}**\n{duration}\t|\t{vview}\n", color=disnake.Color.red(), url=url)
-            embed.set_image(url=pic)
-            await interaction.followup.send(embed=embed, view=view)
-            interaction.guild.voice_client.play(await disnake.FFmpegOpusAudio.from_probe(music, **FFMPEG_OPTIONS))
 
 @client.event
 async def on_member_join(member):
