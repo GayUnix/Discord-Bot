@@ -170,7 +170,7 @@ async def distro(ctx, os):
     view = View()
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
-    await ctx.send(embed, view)
+    await ctx.send(embed=embed, view=view)
 
 @client.command(name="meme", description="Sends a coding meme")
 async def meme(ctx):
@@ -355,7 +355,7 @@ async def distro(interaction, os):
     view = View()
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
-    await interaction.followup.send(embed, view)
+    await interaction.followup.send(embed=embed, view=view)
 
 @client.slash_command(name="urban", description="To get a definition from the urban dictionnary")
 async def urban(interaction, word:str, times: int = 3):
