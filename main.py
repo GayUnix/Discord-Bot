@@ -163,7 +163,7 @@ async def joke(ctx):
     
 @client.command(name="distro", description="get distrowatch info")
 async def distro(ctx, os):
-    description, data = distrowatch(os)
+    data, description = distrowatch(os)
     embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
     for i in data:
         embed.add_field(name= i, value= data[i], inline=False)
@@ -348,7 +348,7 @@ async def git(interaction, user: str):
 @client.slash_command(name="distro", description="get distrowatch info")
 async def distro(interaction, os):
     await interaction.response.defer()
-    description, data = distrowatch(os)
+    data, description = distrowatch(os)
     embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
     for i in data:
         embed.add_field(name= i, value= data[i], inline=False)
