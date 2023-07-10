@@ -166,7 +166,7 @@ async def distro(ctx, os):
     data, description = distrowatch(os)
     embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
     for i in data:
-        embed.add_field(name= i, value= data[i], inline=False)
+        embed.add_field(name=i, value=data[i], inline=False)
     view = View()
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
@@ -194,6 +194,29 @@ async def meme(ctx):
     view = View()
     view.add_item(newmeme)
     return await ctx.send(embed=embed, view=view)
+
+@client.command(name="useless", description="to get some useless fact about something very random")
+async def useless(ctx, lang="en"):
+    data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
+    embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
+    embed.add_field(name="source: ", value=data["source_url"], inline=False)
+    newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
+    view = View()
+    view.add_item(newuseless)
+    async def uselessf(interaction): 
+        await interaction.response.defer()
+        data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
+        embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
+        embed.add_field(name="source: ", value=data["source_url"], inline=False)
+        view = View()
+        newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
+        view.add_item(newuseless)
+        newuseless.callback = uselessf
+        await interaction.followup.send(embed=embed, view=view)
+    newuseless.callback = uselessf
+    await ctx.send(embed=embed, view=view)
+
+
 
 @client.command(name="test", description="To test if the bot is still working")
 async def test(ctx):
@@ -322,6 +345,28 @@ async def meme(interaction):
 @client.slash_command(name="test", description="To test if the bot is still working")
 async def test(interaction):
     return await interaction.send("- tested")
+
+@client.slash_command(name="useless", description="to get some useless fact about something very random")
+async def useless(interaction, lang="en"):
+    await interaction.response.defer()
+    data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
+    embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
+    embed.add_field(name="source: ", value=data["source_url"], inline=False)
+    newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
+    view = View()
+    view.add_item(newuseless)
+    async def uselessf(interaction): 
+        await interaction.response.defer()
+        data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
+        embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
+        embed.add_field(name="source: ", value=data["source_url"], inline=False)
+        view = View()
+        newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
+        view.add_item(newuseless)
+        newuseless.callback = uselessf
+        await interaction.followup.send(embed=embed, view=view)
+    newuseless.callback = uselessf
+    await interaction.followup.send(embed=embed, view=view)
 
 @client.slash_command(name="clear", description="To clear messages")
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
