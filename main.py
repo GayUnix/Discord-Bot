@@ -34,12 +34,6 @@ client                                  =       commands.Bot(command_prefix=pref
 
 darkjokes                               =       json.loads(open("darkjokes.json", "r").read())["jokes"]
 
-def distrowatch(distro):
-    soup = bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")
-    titles = soup.find("td", {"class": "TablesTitle"})
-    data = {j.find("a").text: j.find("b").text for j in titles.find("ul").find_all("li")}
-    return {data[i]: i for i in list(set(data))[::-1]}, titles.text.splitlines()[-3]
-
 def yt_search(keyword: str) -> tuple:
     idk, YDL_OPTIONS = youtubesearchpython.VideosSearch(keyword, limit = 10).result()['result'][0], {'format': 'bestaudio/best', 'noplaylist':'True'}
     with yt_dlp.YoutubeDL(YDL_OPTIONS) as ydl: meta:dict = ydl.extract_info(idk["link"], download=False)
@@ -71,7 +65,6 @@ def create_welcome_image(background, profile, text, username):
     welcome_font = ImageFont.truetype("./Poppins-Bold.ttf", welcome_font_size)
     draw = ImageDraw.Draw(background)
     neg_color = tuple(255 - value for value in background.getpixel((0, 0)))
-    welcome_text_width, welcome_text_height = draw.textsize(text, font=welcome_font)
     welcome_text_x = background.width // 2
     welcome_text_y = y + profile_picture.height + 20
     while draw.textsize(text, font=welcome_font)[0] > max_welcome_width:
@@ -85,29 +78,6 @@ def create_welcome_image(background, profile, text, username):
         username_font = ImageFont.truetype("./Poppins-Light.ttf", min(welcome_font_size - 30, username_font_size))
     draw.text((username_text_x, username_text_y), username, fill=neg_color, font=username_font, anchor="mm")
     return background
-
-def print_board(board):
-    formatted_board = ""
-    for row in board:
-        formatted_board += "-" * 9 + "\n"
-        formatted_board += "|".join(row) + "\n"
-    return formatted_board
-
-def check_winner(board):
-    for row in board:
-        if row[0] == row[1] == row[2] != " ":
-            return row[0]
-
-    for col in range(3):
-        if board[0][col] == board[1][col] == board[2][col] != " ":
-            return board[0][col]
-
-    if board[0][0] == board[1][1] == board[2][2] != " ":
-        return board[0][0]
-    if board[0][2] == board[1][1] == board[2][0] != " ":
-        return board[0][2]
-
-    return None
 
 def I_hate_when_I_am_coding(url) -> list:
     html = requests.get(url).text
@@ -180,9 +150,9 @@ async def darkjoke(ctx):
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
-        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+        return await interaction.followup.send(embed=embed, view=view, ephemeral=True)
     newdj.callback = darkjokef
-    await ctx.send(embed=embed, view=view, ephemeral=True)
+    return await ctx.send(embed=embed, view=view, ephemeral=True)
     
 @client.command(name="distro", description="get distrowatch info")
 async def distro(ctx, os):
@@ -193,19 +163,17 @@ async def distro(ctx, os):
     view = View()
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
-    await ctx.send(embed=embed, view=view)
+    return await ctx.send(embed=embed, view=view)
 
 @client.command(name="meme", description="Sends a coding meme")
 async def meme(ctx):
-    memee = e()
     embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
-    embed.set_image(memee)
+    embed.set_image(e())
     newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
     async def newmemef(interaction): 
         await interaction.response.defer()
-        memee = e()
         embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
-        embed.set_image(memee)
+        embed.set_image(e())
         embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
@@ -233,9 +201,9 @@ async def useless(ctx, lang="en"):
         newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
         view.add_item(newuseless)
         newuseless.callback = uselessf
-        await interaction.followup.send(embed=embed, view=view)
+        return await interaction.followup.send(embed=embed, view=view)
     newuseless.callback = uselessf
-    await ctx.send(embed=embed, view=view)
+    return await ctx.send(embed=embed, view=view)
 
 @client.command(name="test", description="To test if the bot is still working")
 async def test(ctx):
@@ -248,66 +216,23 @@ async def clear(ctx, number: int):
 
 @client.command(name="guess", description="guessing game :3")
 async def guess(ctx, max: int = 100):
-    def check(msg):
-        return msg.channel == ctx.channel and msg.content.isnumeric()
-
+    check = lambda msg: msg.channel == ctx.channel and msg.content.isnumeric()
     n = random.randint(0, max)
     await ctx.send(f"## starting the guessing (min: 0, max: {max})")
     while True:
         try:
             e = await client.wait_for("message", check=check, timeout=60)
-            if any([u in e.content for u in ["leave", "quit"]]):
-                return ctx.send("> Exiting...")
+            if any([u in e.content for u in ["leave", "quit"]]): return ctx.send("> Exiting...")
             if int(e.content) == n:
                 return await e.reply(f"# {e.author} wins!!")
-
             await ctx.send(("- more" if int(e.content) < n else "- less") + " than " + e.content)
         except asyncio.TimeoutError:
-            await ctx.send("> Game timed out. Exiting.")
-            break
-
-@client.command(name="tictactoe", description="just to have fun playing tictactoe with friends :)")
-async def tictactoe(ctx, plyr: disnake.Member):
-    board = [[" ", " ", " "] for _ in range(3)]
-    e = ["X", "O"]
-    random.shuffle(e)
-    players = {e[0]: ctx.author, e[1]: plyr}
-    current_player = e[0]
-    message = await ctx.send(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
-    def check(msg):
-        return msg.member == players[current_player] and msg.channel == ctx.channel
-    while True:
-        try:
-            e = await client.wait_for("message", check=check, timeout=60)
-            if any([u in e.content for u in ["end", "finish", "leave", "quit"]]):
-                return ctx.send("> Exiting...")
-            row, col = [int(i) - 1 for i in e.content.split()[-1].split(".")]
-            if 0 <= row <= 2 and 0 <= col <= 2:
-                if board[row][col] == " ":
-                    board[row][col] = current_player
-                    winner = check_winner(board)
-                    if winner:
-                        await message.edit(content=f"```\n{print_board(board)}\n```\n# Player {players[winner]} wins!")
-                        break
-                    current_player = "O" if current_player == "X" else "X"
-                else:
-                    await ctx.send("Invalid move. Try again.")
-            else:
-                await ctx.send("Invalid input. Row and column should be in the range 1..3.")
-            await message.edit(f"## {players[current_player]}'s turn\n```\n{print_board(board)}\n```\n- play by sending coords, let's take as an example `1.2` for first row second column")
-        except ValueError:
-            await ctx.send("Invalid input. Please enter a valid row and column.")
-        except asyncio.TimeoutError:
-            await ctx.send("> Game timed out. Exiting.")
-            break
+            return await ctx.send("> Game timed out. Exiting.")
 
 @client.command(name="urban", description="To get a definition from the urban dictionnary")
 async def urban(ctx, times: int, *word):
     for index, definition in enumerate(requests.get(f"https://api.urbandictionary.com/v0/define?term={word}").json()["list"][0:times]):
-        try:
-            ctx.send(f"- {index}) {definition['definition']}")
-        except:
-            pass
+        return await ctx.send(f"- {index}) {definition['definition']}")
 
 @client.command(name="run", description = "execute a python code")
 @commands.check_any(commands.is_owner(), commands.has_permissions(administrator=True))
@@ -332,7 +257,7 @@ async def avatar(ctx, user: disnake.Member = None):
 
 @client.command(name="ping", description = "get the bot latency")
 async def ping(ctx):
-    await ctx.send(f"> Pong! {int(datetime.datetime.timestamp(datetime.datetime.now()) - datetime.datetime.timestamp(ctx.message.created_at))}ms")
+    return await ctx.send(f"> Pong! {int(datetime.datetime.timestamp(datetime.datetime.now()) - datetime.datetime.timestamp(ctx.message.created_at))}ms")
 
 @client.slash_command(name="joke", description="Sends a coding joke")
 async def joke(interaction):
@@ -341,15 +266,13 @@ async def joke(interaction):
 @client.slash_command(name="meme", description="Sends a coding meme")
 async def meme(interaction):
     await interaction.response.defer()
-    memee = e()
     embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
-    embed.set_image(memee)
+    embed.set_image(e())
     newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
     async def newmemef(interaction): 
         await interaction.response.defer()
-        memee = e()
         embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
-        embed.set_image(memee)
+        embed.set_image(e())
         embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
@@ -381,9 +304,9 @@ async def useless(interaction, lang="en"):
         newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
         view.add_item(newuseless)
         newuseless.callback = uselessf
-        await interaction.followup.send(embed=embed, view=view)
+        return await interaction.followup.send(embed=embed, view=view)
     newuseless.callback = uselessf
-    await interaction.followup.send(embed=embed, view=view)
+    return await interaction.followup.send(embed=embed, view=view)
 
 @client.slash_command(name="darkjoke", description="to get a really darkjoke")
 async def darkjoke(interaction):
@@ -401,9 +324,9 @@ async def darkjoke(interaction):
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
-        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+        return await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
     newdj.callback = darkjokef
-    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+    return await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @client.slash_command(name="clear", description="To clear messages")
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
@@ -433,11 +356,11 @@ async def distro(interaction, os):
     data, description = distrowatch(os)
     embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
     for i in data:
-        embed.add_field(name= i, value= data[i], inline=False)
+        embed.add_field(name=i, value=data[i], inline=False)
     view = View()
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
-    await interaction.followup.send(embed=embed, view=view)
+    return await interaction.followup.send(embed=embed, view=view)
 
 @client.slash_command(name="urban", description="To get a definition from the urban dictionnary")
 async def urban(interaction, word:str, times: int = 3):
@@ -661,9 +584,8 @@ async def on_member_join(member):
         color=disnake.Color.green(),
         timestamp=datetime.datetime.utcnow()
     )
-    embed.set_footer(text=pyjokes.get_joke())
+    embed.set_footer(text="created at " + str(datetime.datetime.fromtimestamp(member.created_at.timestamp())))
     embed.set_image(url=f"attachment://welcome.png")
-    await channel.send(embed=embed, file=file)
-
+    return await channel.send(embed=embed, file=file)
 
 client.run(token)
