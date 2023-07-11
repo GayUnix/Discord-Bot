@@ -180,7 +180,7 @@ async def darkjoke(ctx):
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
-        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
+        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
     newdj.callback = darkjokef
     await ctx.send(embed=embed, view=view, ephemeral=True)
     
@@ -387,15 +387,13 @@ async def useless(interaction, lang="en"):
 
 @client.slash_command(name="darkjoke", description="to get a really darkjoke")
 async def darkjoke(interaction):
-    await interaction.response.defer()
     data = random.choice(darkjokes)
     embed = disnake.Embed(title="a darkjoke :skull:", description="\u200b", color=disnake.Color.random())
     embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
     newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
     view = View()
     view.add_item(newdj)
-    async def darkjokef(interaction): 
-        await interaction.response.defer()
+    async def darkjokef(interaction):
         data = random.choice(darkjokes)
         embed = disnake.Embed(title="a darkjoke :skull:", description="\u200b", color=disnake.Color.random())
         embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
