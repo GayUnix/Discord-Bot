@@ -344,7 +344,8 @@ async def getrole(interaction, role : disnake.Role):
     try:
         await interaction.author.add_roles(role)
         return await interaction.response.send_message("> the **" + role + "** got assigned successfully", ephemeral=True)
-    except:
+    except Exception as e:
+        await interaction.response.send_message(e, ephemeral=True)
         return await interaction.response.send_message("- sorry, a problem has been occured!\neither internal error or the role can't be assigned to you...", ephemeral=True)
 
 @client.slash_command(name="git", description = "get someone's git infos")
