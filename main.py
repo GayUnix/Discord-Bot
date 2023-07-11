@@ -166,7 +166,7 @@ async def joke(ctx):
 @client.command(name="darkjoke", description="to get a really darkjoke")
 async def darkjoke(ctx):
     data = random.choice(darkjokes)
-    embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+    embed = disnake.Embed(title="a darkjoke :skull:", description="\u200b", color=disnake.Color.random())
     embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
     newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
     view = View()
@@ -174,7 +174,7 @@ async def darkjoke(ctx):
     async def darkjokef(interaction): 
         await interaction.response.defer()
         data = random.choice(darkjokes)
-        embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+        embed = disnake.Embed(title="a darkjoke :skull:", description="\u200b", color=disnake.Color.random())
         embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
         view = View()
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
@@ -391,7 +391,7 @@ async def useless(interaction, lang="en"):
 async def darkjoke(interaction):
     await interaction.response.defer()
     data = random.choice(darkjokes)
-    embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+    embed = disnake.Embed(title="a darkjoke :skull:", description="\u200b", color=disnake.Color.random())
     embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
     newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
     view = View()
@@ -399,7 +399,7 @@ async def darkjoke(interaction):
     async def darkjokef(interaction): 
         await interaction.response.defer()
         data = random.choice(darkjokes)
-        embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+        embed = disnake.Embed(title="a darkjoke :skull:", description="\u200b", color=disnake.Color.random())
         embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
         view = View()
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
