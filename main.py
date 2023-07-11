@@ -104,7 +104,7 @@ def distrowatch(distro):
 async def on_ready():
     print(f"Logged in as {client.user}!")
     await client.change_presence(activity=disnake.Streaming(name="💻VisualStudio Code", url="https://github.com/NacreousDawn596"))
-    meme_channels = sum([[channel for channel in guild.text_channels if "meme" in channel.name] for guild in client.guilds], [])
+    globals()["meme_channels"] = sum([[channel for channel in guild.text_channels if "meme" in channel.name] for guild in client.guilds], [])
     while True:
         memee = e()
         embed = disnake.Embed(title="meme time lol", color=disnake.Color.random())
@@ -124,7 +124,7 @@ async def on_ready():
         newmeme.callback = newmemef
         view = View()
         view.add_item(newmeme)
-        for channel in meme_channels:
+        for channel in globals()["meme_channels"]:
             await channel.send(embed=embed, view=view)
         await asyncio.sleep(60*60*4)
 
@@ -566,6 +566,7 @@ async def resume(interaction):
 
 @client.event
 async def on_member_join(member):
+    globals()["meme_channels"] = sum([[channel for channel in guild.text_channels if "meme" in channel.name] for guild in client.guilds], [])
     channel = member.guild.system_channel
     wallpapers = json.loads(open("wallpapers.json", 'r').read())
     def get_valid_wallpaper():
