@@ -156,7 +156,7 @@ async def on_ready():
         view.add_item(newmeme)
         for channel in meme_channels:
             await channel.send(embed=embed, view=view)
-        await asyncio.sleep(60*60)
+        await asyncio.sleep(60*60*4)
 
 
 @client.command(name="joke", description="Sends a coding joke")
