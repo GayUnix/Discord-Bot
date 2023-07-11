@@ -339,14 +339,14 @@ async def run(interaction, *, code):
     await interaction.response.defer()
     return await interaction.followup.send(eval(code))
 
-@client.slash_command(name="getrole", description = "to assign a role to yourself")
-async def getrole(interaction, role : disnake.Role):
-    try:
-        await interaction.author.add_roles(role)
-        return await interaction.response.send_message("> the **" + str(role.name) + "** got assigned successfully", ephemeral=True)
-    except Exception as e:
-        await interaction.response.send_message(e, ephemeral=True)
-        return await interaction.response.send_message("- sorry, a problem has been occured!\neither internal error or the role can't be assigned to you...", ephemeral=True)
+#@client.slash_command(name="getrole", description = "to assign a role to yourself")
+#async def getrole(interaction, role : disnake.Role):
+#    try:
+#        await interaction.author.add_roles(role)
+#        return await interaction.response.send_message("> the **" + str(role.name) + "** got assigned successfully", ephemeral=True)
+#    except Exception as e:
+#        await interaction.response.send_message(e, ephemeral=True)
+#        return await interaction.response.send_message("- sorry, a problem has been occured!\neither internal error or the role can't be assigned to you...", ephemeral=True)
 
 @client.slash_command(name="git", description = "get someone's git infos")
 async def git(interaction, user: str):
