@@ -32,6 +32,8 @@ intents                                 =       disnake.Intents().all()
 
 client                                  =       commands.Bot(command_prefix=prefix, intents=intents)
 
+darkjokes                               =       json.loads(open("darkjokes.json", "r").read())
+
 def distrowatch(distro):
     soup = bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")
     titles = soup.find("td", {"class": "TablesTitle"})
@@ -160,6 +162,27 @@ async def on_ready():
 @client.command(name="joke", description="Sends a coding joke")
 async def joke(ctx):
     return await ctx.send(f"> {pyjokes.get_joke()}")
+
+@client.command(name="darkjoke", description="to get a really darkjoke")
+async def darkjoke(ctx):
+    data = random.choice(darkjokes)
+    embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+    embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
+    newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
+    view = View()
+    view.add_item(newdj)
+    async def darkjokef(interaction): 
+        await interaction.response.defer()
+        data = random.choice(darkjokes)
+        embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+        embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
+        view = View()
+        newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
+        view.add_item(newdj)
+        newdj.callback = darkjokef
+        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+    newdj.callback = darkjokef
+    await ctx.send(embed=embed, view=view, ephemeral=True)
     
 @client.command(name="distro", description="get distrowatch info")
 async def distro(ctx, os):
@@ -363,6 +386,28 @@ async def useless(interaction, lang="en"):
         await interaction.followup.send(embed=embed, view=view)
     newuseless.callback = uselessf
     await interaction.followup.send(embed=embed, view=view)
+
+@client.slash_command(name="darkjoke", description="to get a really darkjoke")
+async def darkjoke(interaction):
+    await interaction.response.defer()
+    data = random.choice(darkjokes)
+    embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+    embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
+    newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
+    view = View()
+    view.add_item(newdj)
+    async def darkjokef(interaction): 
+        await interaction.response.defer()
+        data = random.choice(darkjokes)
+        embed = disnake.Embed(title="a darkjoke :skull:", description="\u200", color=disnake.Color.random())
+        embed.add_field(name=data["buildup"] + "?", value=data["punchline"], inline=False)
+        view = View()
+        newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
+        view.add_item(newdj)
+        newdj.callback = darkjokef
+        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+    newdj.callback = darkjokef
+    await interaction.followup.send(embed=embed, view=view, ephemeral=True)
 
 @client.slash_command(name="clear", description="To clear messages")
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
