@@ -32,7 +32,7 @@ intents                                 =       disnake.Intents().all()
 
 client                                  =       commands.Bot(command_prefix=prefix, intents=intents)
 
-darkjokes                               =       json.loads(open("darkjokes.json", "r").read())
+darkjokes                               =       json.loads(open("darkjokes.json", "r").read())["jokes"]
 
 def distrowatch(distro):
     soup = bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")
