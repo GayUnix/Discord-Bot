@@ -343,7 +343,7 @@ async def run(interaction, *, code):
 async def getrole(interaction, role : disnake.Role):
     try:
         await interaction.author.add_roles(role)
-        return await interaction.response.send_message("> the **" + role + "** got assigned successfully", ephemeral=True)
+        return await interaction.response.send_message("> the **" + str(role.name) + "** got assigned successfully", ephemeral=True)
     except Exception as e:
         await interaction.response.send_message(e, ephemeral=True)
         return await interaction.response.send_message("- sorry, a problem has been occured!\neither internal error or the role can't be assigned to you...", ephemeral=True)
