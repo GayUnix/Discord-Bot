@@ -180,7 +180,7 @@ async def darkjoke(ctx):
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
-        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
     newdj.callback = darkjokef
     await ctx.send(embed=embed, view=view, ephemeral=True)
     
@@ -236,8 +236,6 @@ async def useless(ctx, lang="en"):
         await interaction.followup.send(embed=embed, view=view)
     newuseless.callback = uselessf
     await ctx.send(embed=embed, view=view)
-
-
 
 @client.command(name="test", description="To test if the bot is still working")
 async def test(ctx):
@@ -405,9 +403,9 @@ async def darkjoke(interaction):
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
-        await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+        await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
     newdj.callback = darkjokef
-    await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 @client.slash_command(name="clear", description="To clear messages")
 @commands.check_any(commands.is_owner(), commands.has_permissions(manage_channels=True))
