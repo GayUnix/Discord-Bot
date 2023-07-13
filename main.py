@@ -99,7 +99,7 @@ def distrowatch(distro):
     titles = soup.find("td", {"class": "TablesTitle"})
     data = {j.find("a").text: j.find("b").text for j in titles.find("ul").find_all("li")}
     def checkforlink(soup=soup) -> str:
-        if "rating&distro" in soup.find_all("a")[99]["href"] or "distro" in soup.find_all("a")[99]["href"]:
+        if any([j in soup.find_all("a")[99]["href"] for j in ["distro", "rating&distro", "listinfo"]]):
             return checkforlink(soup=bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser"))
         else:
             return soup.find_all("a")[99]["href"]
