@@ -98,7 +98,8 @@ def distrowatch(distro):
     soup = bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")
     titles = soup.find("td", {"class": "TablesTitle"})
     data = {j.find("a").text: j.find("b").text for j in titles.find("ul").find_all("li")}
-    return {data[i]: i for i in list(set(data))[::-1]}, titles.text.splitlines()[-3]
+    checkforlink = lambda soup: checkforlink(soup=bs4.BeautifulSoup(requests.get(f"https://distrowatch.com/table.php?distribution={distro}").text, "html.parser")) if "ratings&distro" in soup.find_all("a")[99]["href"] else soup.find_all("a")[99]["href"]
+    return {data[i]: i for i in list(set(data))[::-1]}, titles.text.splitlines()[-3][::4000], checkforlink(soup)
 
 @client.event
 async def on_ready():
@@ -156,8 +157,9 @@ async def darkjoke(ctx):
     
 @client.command(name="distro", description="get distrowatch info")
 async def distro(ctx, os):
-    data, description = distrowatch(os)
+    data, description, url = distrowatch(os)
     embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
+    embed.add_field(name="Home Page:", value="- **" + url + "**", inline=False)
     for i in data:
         embed.add_field(name=i, value=data[i], inline=False)
     view = View()
@@ -362,8 +364,9 @@ async def git(interaction, user: str):
 @client.slash_command(name="distro", description="get distrowatch info")
 async def distro(interaction, os):
     await interaction.response.defer()
-    data, description = distrowatch(os)
+    data, description, url = distrowatch(os)
     embed = disnake.Embed(title=f'{os} according to distrowatch', description=description, url=f"https://distrowatch.com/table.php?distribution={os}")
+    embed.add_field(name="Home Page:", value="- **" + url + "**", inline=False)
     for i in data:
         embed.add_field(name=i, value=data[i], inline=False)
     view = View()
