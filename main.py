@@ -123,11 +123,11 @@ async def on_ready():
             embed.set_image(memee)
             newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
             newmeme.callback = newmemef
-            view = View()
+            view = View(timeout=None)
             view.add_item(newmeme)
             return await interaction.send(embed=embed, view=view)
         newmeme.callback = newmemef
-        view = View()
+        view = View(timeout=None)
         view.add_item(newmeme)
         for channel in globals()["meme_channels"]:
             await channel.send(embed=embed, view=view)
@@ -144,14 +144,14 @@ async def darkjoke(ctx):
     embed = disnake.Embed(title="a dark joke :skull:", description="- _expect everything..._", color=disnake.Color.random())
     embed.add_field(name=data["buildup"] + "?", value="**"+data["punchline"]+"**", inline=False)
     newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
-    view = View()
+    view = View(timeout=None)
     view.add_item(newdj)
     async def darkjokef(interaction): 
         await interaction.response.defer()
         data = random.choice(darkjokes)
         embed = disnake.Embed(title="a dark joke :skull:", description="- _expect everything..._", color=disnake.Color.random())
         embed.add_field(name=data["buildup"] + "?", value="**"+data["punchline"]+"**", inline=False)
-        view = View()
+        view = View(timeout=None)
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
@@ -166,7 +166,7 @@ async def distro(ctx, os):
     embed.add_field(name="Home Page:", value="- **" + url + "**", inline=False)
     for i in data:
         embed.add_field(name=i, value=data[i], inline=False)
-    view = View()
+    view = View(timeout=None)
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
     return await ctx.send(embed=embed, view=view)
@@ -183,12 +183,12 @@ async def meme(ctx):
         embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
-        view = View()
+        view = View(timeout=None)
         view.add_item(newmeme)
         embed.set_footer()
         return await interaction.send(embed=embed, view=view)
     newmeme.callback = newmemef
-    view = View()
+    view = View(timeout=None)
     view.add_item(newmeme)
     return await ctx.send(embed=embed, view=view)
 
@@ -197,13 +197,13 @@ async def useless(ctx, lang="en"):
     data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
     embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
     newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
-    view = View()
+    view = View(timeout=None)
     view.add_item(newuseless)
     async def uselessf(interaction): 
         await interaction.response.defer()
         data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
         embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
-        view = View()
+        view = View(timeout=None)
         newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
         view.add_item(newuseless)
         newuseless.callback = uselessf
@@ -248,7 +248,7 @@ async def run(ctx, *, code):
 @client.command(name="git", description = "get someone's git infos")
 async def git(ctx, user: str):
     data = requests.get(f"https://api.github.com/users/{user}").json()
-    embed, button, view = disnake.Embed(title=f"{data['name']}'s profil", url=f"https://github.com/{data['name']}", color=disnake.Color.purple()), Button(label="Github", url=f"https://github.com/{data['name']}", emoji="<:github:879129561084870726>"), View()
+    embed, button, view = disnake.Embed(title=f"{data['name']}'s profil", url=f"https://github.com/{data['name']}", color=disnake.Color.purple()), Button(label="Github", url=f"https://github.com/{data['name']}", emoji="<:github:879129561084870726>"), View(timeout=None)
     embed.set_image(url=data["avatar_url"])
     for key in ["name", "followers", "following", "bio", "public_repos", "created_at"]:
         embed.add_field(name=f"{key}:", value=data[key], inline=True)
@@ -282,11 +282,11 @@ async def meme(interaction):
         embed.set_footer(text=f"requested by {interaction.author.name}")
         newmeme = Button(label="new one! :3", style=disnake.ButtonStyle.green)
         newmeme.callback = newmemef
-        view = View()
+        view = View(timeout=None)
         view.add_item(newmeme)
         return await interaction.send(embed=embed, view=view)
     newmeme.callback = newmemef
-    view = View()
+    view = View(timeout=None)
     view.add_item(newmeme)
     return await interaction.send(embed=embed, view=view)
 
@@ -300,13 +300,13 @@ async def useless(interaction, lang="en"):
     data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
     embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
     newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
-    view = View()
+    view = View(timeout=None)
     view.add_item(newuseless)
     async def uselessf(interaction): 
         await interaction.response.defer()
         data = requests.get(f'https://uselessfacts.jsph.pl/api/v2/facts/random?language={lang}').json()
         embed = disnake.Embed(title="Useless Fact lmao", description="**" + data["text"] + "**", color=disnake.Color.random())
-        view = View()
+        view = View(timeout=None)
         newuseless = Button(label="again ^^", style=disnake.ButtonStyle.green)
         view.add_item(newuseless)
         newuseless.callback = uselessf
@@ -320,13 +320,13 @@ async def darkjoke(interaction):
     embed = disnake.Embed(title="a dark joke :skull:", description="- _expect everything..._", color=disnake.Color.random())
     embed.add_field(name=data["buildup"] + "?", value="**"+data["punchline"]+"**", inline=False)
     newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
-    view = View()
+    view = View(timeout=None)
     view.add_item(newdj)
     async def darkjokef(interaction):
         data = random.choice(darkjokes)
         embed = disnake.Embed(title="a dark joke :skull:", description="- _expect everything..._", color=disnake.Color.random())
         embed.add_field(name=data["buildup"] + "?", value="**"+data["punchline"]+"**", inline=False)
-        view = View()
+        view = View(timeout=None)
         newdj = Button(label="more >:)", style=disnake.ButtonStyle.green)
         view.add_item(newdj)
         newdj.callback = darkjokef
@@ -358,7 +358,7 @@ async def getrole(interaction, role : disnake.Role):
 async def git(interaction, user: str):
     await interaction.response.defer()
     data = requests.get(f"https://api.github.com/users/{user}").json()
-    embed, button, view = disnake.Embed(title=f"{data['name']}'s profile", url=f"https://github.com/{data['name']}", color=disnake.Color.purple()), Button(label="Github", url=f"https://github.com/{data['name']}", emoji="<:github:879129561084870726>"), View()
+    embed, button, view = disnake.Embed(title=f"{data['name']}'s profile", url=f"https://github.com/{data['name']}", color=disnake.Color.purple()), Button(label="Github", url=f"https://github.com/{data['name']}", emoji="<:github:879129561084870726>"), View(timeout=None)
     embed.set_image(url=data["avatar_url"])
     for key in ["name", "followers", "following", "bio", "public_repos", "created_at"]:
         embed.add_field(name=f"{key}:", value=data[key], inline=True)
@@ -373,7 +373,7 @@ async def distro(interaction, os):
     embed.add_field(name="Home Page:", value="- **" + url + "**", inline=False)
     for i in data:
         embed.add_field(name=i, value=data[i], inline=False)
-    view = View()
+    view = View(timeout=None)
     redirect = Button(label="See it on distrowatch :)", url=f"https://distrowatch.com/table.php?distribution={os}")
     view.add_item(redirect)
     return await interaction.followup.send(embed=embed, view=view)
@@ -518,7 +518,7 @@ async def play(interaction, keyword:str):
             if interaction.author.voice and interaction.guild.voice_client.is_connected() and interaction.guild.voice_client.is_playing():
                 interaction.guild.voice_client.stop()
                 await interaction.send("> stopped :/")
-        resume.callback, pause.callback, skip.callback, view = resumef, pausef, skipf, View()
+        resume.callback, pause.callback, skip.callback, view = resumef, pausef, skipf, View(timeout=None)
         for b in [resume, pause, skip, urlb]:
             view.add_item(b)
         embed = disnake.Embed(title=name, description=f"**{description}**\n{duration}\t|\t{vview}\n", color=disnake.Color.red(), url=url)
