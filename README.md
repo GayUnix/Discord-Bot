@@ -18,3 +18,7 @@ cd Discord-Bot
 
 # how to run:
 - `python main.py`
+
+# Licensing
+
+This code is under AGPLv3-or-later.
